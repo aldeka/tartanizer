@@ -3,7 +3,7 @@
 
   let canvas: HTMLCanvasElement;
 
-  const size = 480;
+  const size = 640;
   const step = 2;
 
   const paletteLabels = {
