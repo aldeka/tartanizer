@@ -124,7 +124,7 @@
 	}
 
 	function makeThreadList(colorsText: string, activePalette: { [key: string]: number }): string[] {
-		const segments = colorsText.split(' ');
+		const segments = colorsText.trim().split(' ');
 		let retval: string[] = [];
 		for (const segment of segments) {
 			const color = makeColor(segment);
@@ -145,6 +145,33 @@
 	function setPaletteColor(colorCode: string, index: number) {
 		activePaletteIndices[colorCode] = index;
 	}
+
+	function randomizePattern() {
+		const maxChunkSize = 60;
+		const maxPatternSize = 160;
+
+		let pattern = '';
+		let patternSize = 0;
+
+		const codes = Object.keys(palette);
+
+		while (patternSize < maxPatternSize) {
+			const newCode = codes[Math.round(Math.random() * (codes.length - 1))];
+			let newNumber = Math.round(Math.random() * maxChunkSize);
+			if (newNumber < 40 && newNumber > 6) {
+				// thumb on the scale makes stripes more likely to be large or small,
+				// rather than a bunch of same-width stripes
+				newNumber = Math.round(newNumber / 2);
+			}
+			if (patternSize + newNumber > maxPatternSize) {
+				newNumber = maxPatternSize - patternSize;
+			}
+			pattern += ` ${newCode}${newNumber}`;
+			patternSize += newNumber;
+		}
+
+		colorString = pattern;
+	}
 </script>
 
 <svelte:head>
@@ -152,78 +179,110 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<section>
+<section id="wrapper">
 	<h1>Tartan simulator</h1>
 
-	<label
-		>pattern
-		<input type="text" bind:value={colorString} />
-	</label>
+	<section id="pattern-spec">
+		<label
+			>pattern
+			<input type="text" bind:value={colorString} />
+		</label>
+		<button on:click={randomizePattern}>I'm feeling lucky</button>
+	</section>
 
-	<div id="main">
-		<div id="palette">
+	<main>
+		<section id="palette">
 			<h2>Palette</h2>
 			{#each Object.keys(palette) as colorCode}
-				<div>
-					<label
-						class={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1
-							? 'used'
-							: 'unused'}
-						>{paletteLabels[colorCode]} ({colorCode}):
-						<div
-							class="color-preview"
-							style={`
-								background-color: #${palette[colorCode][activePaletteIndices[colorCode]]}
-							`}
-						/>
-						<select
-							value={activePaletteIndices[colorCode]}
-							on:change={(e) => setPaletteColor(e, colorCode)}
-						>
-							{#each palette[colorCode] as color, i}
-								<option value={i}>
-									#{color}
-								</option>
-							{/each}
-						</select>
-					</label>
-				</div>
+				<ColorSelector
+					used={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1}
+					code={colorCode}
+					label={paletteLabels[colorCode]}
+					options={palette[colorCode]}
+					activeIndex={activePaletteIndices[colorCode]}
+					{setPaletteColor}
+				/>
 			{/each}
-		</div>
+		</section>
 
 		<TartanCanvas {threadList} />
-	</div>
+	</main>
 </section>
 
 <style>
-	section {
+	section#wrapper {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		align-items: center;
-		flex: 0.6;
+		align-items: stretch;
+		font-size: 16px;
+	}
+
+	section#wrapper * {
+		box-sizing: border-box;
 	}
 
 	h1 {
 		width: 100%;
 	}
 
+	section#pattern-spec {
+		display: flex;
+		align-items: flex-end;
+		margin-bottom: 0.5em;
+	}
+
 	label {
 		text-align: left;
-		width: 100%;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		margin-right: 1em;
+	}
+
+	input,
+	button {
+		max-height: 3em;
+		min-height: 3em;
 	}
 
 	label input {
-		width: 100%;
+		padding: 0 0.5em;
 	}
 
-	label.unused {
-		color: #888;
-	}
+	button {
+		cursor: pointer;
+		display: block;
+		flex: 0;
+		min-width: 180px;
+		border-radius: 0.25em;
+		font-weight: 900;
+		color: white;
+		border-color: black;
 
-	label.used {
-		color: #000;
-		font-weight: 700;
+		background: #000
+			repeating-linear-gradient(
+				120deg,
+				#bcc3d299,
+				#2c408499 2px,
+				#50505099 2px,
+				#5a008c99 4px,
+				#98c8e899 4px,
+				#a0000099 6px,
+				#781c3899 6px,
+				#40806099 8px,
+				#be783299 8px,
+				#98481c99 10px,
+				#44004499 10px,
+				#e0a12699 12px,
+				#78948499 12px,
+				#c8c8c899 14px,
+				#00544899 14px,
+				#10101099 16px,
+				#a0a0a099 16px,
+				#4c342899 18px
+			);
 	}
 
 	h2 {
