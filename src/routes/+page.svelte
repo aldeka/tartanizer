@@ -226,8 +226,8 @@
     ],
   };
 
-  function makeChunk(length: number, color: string): string[] {
-    const chunk = new Array(length).fill(color);
+  function makeChunk(length: number, colorCode: string): string[] {
+    const chunk = new Array(length).fill(colorCode);
     return chunk;
   }
 
@@ -255,7 +255,7 @@
       if (color !== undefined) {
         const [threadCount, colorCode] = color;
         const paletteIndex = activePaletteIndices[colorCode];
-        retval = retval.concat(makeChunk(threadCount, palette[colorCode][paletteIndex]));
+        retval = retval.concat(makeChunk(threadCount, colorCode));
       }
     }
     return retval;
@@ -280,9 +280,11 @@
       const lineWidth = (size / colors.length) - 2;
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      function generateVertThreads(color: string, index: number) {
+      function generateVertThreads(colorCode: string, index: number) {
         const x = index * multiplier + (multiplier / 2);
         const topStartPoint = index % 4 - 4;
+        const paletteIndex = activePaletteIndices[colorCode];
+        const color = palette[colorCode][paletteIndex];
         let rawY = topStartPoint;
         while (rawY < colors.length) {
           const subthread: Thread = {
@@ -295,10 +297,12 @@
         }
       }
 
-      function generateHorizThreads(color: string, index: number) {
+      function generateHorizThreads(colorCode: string, index: number) {
         const y = index * multiplier + (multiplier / 2);
         const leftStartPoint = index % 4 - 3;
         let rawX = leftStartPoint;
+        const paletteIndex = activePaletteIndices[colorCode];
+        const color = palette[colorCode][paletteIndex];
         while (rawX < colors.length) {
           const subthread: Thread = {
             start: [rawX * multiplier, y],
@@ -356,7 +360,31 @@
     <input type="text" bind:value={colorString} />
   </label>
 
-  <canvas bind:this={canvas} height={size} width={size} />
+  <div id="main">
+    <div id="palette">
+      <h2>Palette</h2>
+    {#each Object.keys(activePaletteIndices) as colorCode }
+      <div>
+        <label class={colors.indexOf(colorCode) !== -1 ? 'used' : 'unused'}>{paletteLabels[colorCode]} ({colorCode}):
+          <select value={activePaletteIndices[colorCode]}
+            on:change={(e) => {
+                console.log(e);
+                activePaletteIndices[colorCode] = parseInt(e.target.value, 10);
+            }}
+          >
+            {#each palette[colorCode] as color, i}
+              <option value={i}>
+                #{palette[colorCode][i]}
+              </option>
+            {/each}
+          </select>
+        </label>
+      </div>
+    {/each}
+    </div>
+
+    <canvas bind:this={canvas} height={size} width={size} />
+  </div>
 </section>
 
 <style>
@@ -379,6 +407,38 @@
 
   label input {
     width: 100%;
+  }
+
+  label.unused {
+    color: #888;
+  }
+
+  label.used {
+    color: #000;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: 24px;
+    margin: 0;
+  }
+
+  #main {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  #palette label {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  #palette select {
+    width: 6em;
+    font-family: monospace;
   }
 
   canvas {
