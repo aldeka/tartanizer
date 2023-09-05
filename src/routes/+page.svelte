@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ColorSelector from './colorSelector.svelte';
 	import TartanCanvas from './tartanCanvas.svelte';
 
 	const paletteLabels: { [key: string]: string } = {
@@ -141,11 +142,8 @@
 	let colorString = 'B24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B4';
 	$: threadList = makeThreadList(colorString, activePaletteIndices);
 
-	function setPaletteColor(e: Event, colorCode: string) {
-		const target = e.target as HTMLSelectElement;
-		if (target.value) {
-			activePaletteIndices[colorCode] = parseInt(target.value, 10);
-		}
+	function setPaletteColor(colorCode: string, index: number) {
+		activePaletteIndices[colorCode] = index;
 	}
 </script>
 
@@ -233,26 +231,11 @@
 		margin: 0;
 	}
 
-	#main {
+	main {
 		width: 100%;
 		display: flex;
 		flex-direction: row;
 		align-items: flex-start;
 		justify-content: space-between;
-	}
-
-	#palette label {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-end;
-	}
-	#palette select {
-		width: 6em;
-		font-family: monospace;
-	}
-
-	.color-preview {
-		height: 1em;
-		width: 1em;
 	}
 </style>
