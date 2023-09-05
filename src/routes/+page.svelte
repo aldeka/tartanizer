@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { afterUpdate, onMount } from 'svelte';
 
   let canvas: HTMLCanvasElement;
 
@@ -261,12 +261,8 @@
     return retval;
   }
 
-  // TODO: make this user-editable
   let colorString = "6B 1T 1Y 1T 1B 5T 5G 2T 6G 5T 6B 1R 1Y";
-  let colors = makeColors(colorString);
-
-  const multiplier = size / colors.length;
-  const lineWidth = size / 40 - 1;
+  $: colors = makeColors(colorString);
 
   type Thread = {
     start: [number, number];
@@ -274,21 +270,21 @@
     color: string;
   };
 
-  const topThreads: Thread[] = [];
-  const bottomThreads: Thread[] = [];
-
-
-  onMount(() => {
+  const repaint = () => {
     const ctx = canvas.getContext('2d');
 
     if (ctx) {
+      const topThreads: Thread[] = [];
+      const bottomThreads: Thread[] = [];
+      const multiplier = size / colors.length;
+      const lineWidth = (size / colors.length) - 2;
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       function generateVertThreads(color: string, index: number) {
-        const x = index * multiplier + lineWidth / 2;
+        const x = index * multiplier + (multiplier / 2);
         const topStartPoint = index % 4 - 4;
         let rawY = topStartPoint;
-        while (rawY < 40) {
+        while (rawY < colors.length) {
           const subthread: Thread = {
             start: [x, rawY * multiplier],
             end: [x, (rawY + step) * multiplier],
@@ -303,7 +299,7 @@
         const y = index * multiplier + lineWidth / 2;
         const leftStartPoint = index % 4 - 3;
         let rawX = leftStartPoint;
-        while (rawX < 40) {
+        while (rawX < colors.length) {
           const subthread: Thread = {
             start: [rawX * multiplier, y],
             end: [(rawX + step) * multiplier, y],
@@ -339,6 +335,14 @@
         ctx.stroke();
       });
     }
+  };
+
+  onMount(() => {
+    repaint();
+  });
+
+  afterUpdate(() => {
+    repaint();
   });
 </script>
 
