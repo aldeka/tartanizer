@@ -66,6 +66,9 @@
 		DG: ['003C14', '003820', '004028', '002814'],
 		LB: ['BCC3D2', '98C8E8', '82CFFD', '00FCFC'],
 		B: [
+			'2C4084',
+			'1870A4',
+			'1474B4',
 			'048888',
 			'3C82AF',
 			'5C8CA8',
@@ -77,10 +80,7 @@
 			'3850C8',
 			'788CB4',
 			'5F749C',
-			'1870A4',
-			'1474B4',
-			'0000CD',
-			'2C4084'
+			'0000CD'
 		],
 		DB: [
 			'055183',
@@ -97,7 +97,7 @@
 		LP: ['A8ACE8', 'C49CD8', '806D84', '9C68A4'],
 		P: ['9058D8', 'AA00FF', 'B458AC', '6C0070', '5A008C', '64008C', '780078'],
 		DP: ['440044', '1E0948'],
-		W: ['E5DDD1', 'E8CCB8', 'F0E0C8', 'FCFCFC', 'FFFFFF', 'F8F8F8'],
+		W: ['FFFFFF', 'E5DDD1', 'E8CCB8', 'F0E0C8', 'FCFCFC', 'F8F8F8'],
 		LN: ['E0E0E0'],
 		N: ['C8C8C8', 'C0C0C0', 'B0B0B0', 'A0A0A0', '808080', '888888', '646464'],
 		DN: ['505050', '555A64', '1C1714', '14283C', '1C1C1C'],
@@ -164,8 +164,7 @@
 			function generateVertThreads(colorCode: string, index: number) {
 				const x = index * multiplier + multiplier / 2;
 				const topStartPoint = (index % 4) - 4;
-				const paletteIndex = activePaletteIndices[colorCode];
-				const color = palette[colorCode][paletteIndex];
+				const color = palette[colorCode][activePaletteIndices[colorCode]];
 				let rawY = topStartPoint;
 				while (rawY < colors.length) {
 					const subthread: Thread = {
@@ -184,8 +183,7 @@
 				const y = index * multiplier + multiplier / 2;
 				const leftStartPoint = (index % 4) - 3;
 				let rawX = leftStartPoint;
-				const paletteIndex = activePaletteIndices[colorCode];
-				const color = palette[colorCode][paletteIndex];
+				const color = palette[colorCode][activePaletteIndices[colorCode]];
 				while (rawX < colors.length) {
 					const subthread: Thread = {
 						start: [rawX * multiplier, y],
@@ -258,6 +256,12 @@
 				<div>
 					<label class={colors.indexOf(colorCode) !== -1 ? 'used' : 'unused'}
 						>{paletteLabels[colorCode]} ({colorCode}):
+						<div
+							class="color-preview"
+							style={`
+								background-color: #${palette[colorCode][activePaletteIndices[colorCode]]}
+							`}
+						/>
 						<select
 							value={activePaletteIndices[colorCode]}
 							on:change={(e) => setPaletteColor(e, colorCode)}
@@ -329,6 +333,11 @@
 	#palette select {
 		width: 6em;
 		font-family: monospace;
+	}
+
+	.color-preview {
+		height: 1em;
+		width: 1em;
 	}
 
 	canvas {
