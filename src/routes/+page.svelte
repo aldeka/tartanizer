@@ -263,30 +263,28 @@
 		min-width: 180px;
 		border-radius: 0.25em;
 		font-weight: 900;
-		color: white;
-		border-color: black;
 
-		background: #000
+		background: #fff
 			repeating-linear-gradient(
 				120deg,
-				#bcc3d299,
-				#2c408499 2px,
-				#50505099 2px,
-				#5a008c99 4px,
-				#98c8e899 4px,
-				#a0000099 6px,
-				#781c3899 6px,
-				#40806099 8px,
-				#be783299 8px,
-				#98481c99 10px,
-				#44004499 10px,
-				#e0a12699 12px,
-				#78948499 12px,
-				#c8c8c899 14px,
-				#00544899 14px,
-				#10101099 16px,
-				#a0a0a099 16px,
-				#4c342899 18px
+				#bcc3d266,
+				#2c408466 2px,
+				#50505066 2px,
+				#5a008c66 4px,
+				#98c8e866 4px,
+				#a0000066 6px,
+				#781c3866 6px,
+				#40806066 8px,
+				#be783266 8px,
+				#98481c66 10px,
+				#44004466 10px,
+				#e0a12666 12px,
+				#78948466 12px,
+				#c8c8c866 14px,
+				#00544866 14px,
+				#10101066 16px,
+				#a0a0a066 16px,
+				#4c342866 18px
 			);
 	}
 
