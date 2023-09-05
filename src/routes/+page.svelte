@@ -239,11 +239,11 @@
     activePaletteIndices[color] = 0;
   }
 
-  const colorRe = new RegExp(`(\\d+)(${validColorCodes.join("|")})`);
+  const colorRe = new RegExp(`(${validColorCodes.join("|")})(\\d+)`);
   function makeColor(c: string): [number, string] | undefined {
     const m = c.match(colorRe);
     if (m) {
-      return [parseInt(m[1], 10), m[2]];
+      return [parseInt(m[2], 10), m[1]];
     }
   }
 
@@ -261,7 +261,8 @@
     return retval;
   }
 
-  let colorString = "6B 1T 1Y 1T 1B 5T 5G 2T 6G 5T 6B 1R 1Y";
+  // Demo is the standard Black Watch pattern
+  let colorString = "B24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B4";
   $: colors = makeColors(colorString);
 
   type Thread = {
