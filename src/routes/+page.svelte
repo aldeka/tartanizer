@@ -296,7 +296,7 @@
       }
 
       function generateHorizThreads(color: string, index: number) {
-        const y = index * multiplier + lineWidth / 2;
+        const y = index * multiplier + (multiplier / 2);
         const leftStartPoint = index % 4 - 3;
         let rawX = leftStartPoint;
         while (rawX < colors.length) {
