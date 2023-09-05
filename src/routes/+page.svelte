@@ -152,22 +152,27 @@
 
 		let pattern = '';
 		let patternSize = 0;
+		let prevCode = '';
 
 		const codes = Object.keys(palette);
 
 		while (patternSize < maxPatternSize) {
 			const newCode = codes[Math.round(Math.random() * (codes.length - 1))];
-			let newNumber = Math.round(Math.random() * maxChunkSize);
-			if (newNumber < 40 && newNumber > 6) {
-				// thumb on the scale makes stripes more likely to be large or small,
-				// rather than a bunch of same-width stripes
-				newNumber = Math.round(newNumber / 2);
+			// don't have adjacent blocks of the same color
+			if (newCode !== prevCode) {
+				let newNumber = Math.round(Math.random() * maxChunkSize) + 1; // don't want a zero
+				if (newNumber < 40 && newNumber > 6) {
+					// thumb on the scale makes stripes more likely to be large or small,
+					// rather than a bunch of same-width stripes
+					newNumber = Math.round(newNumber / 2);
+				}
+				if (patternSize + newNumber > maxPatternSize) {
+					newNumber = maxPatternSize - patternSize;
+				}
+				pattern += ` ${newCode}${newNumber}`;
+				patternSize += newNumber;
+				prevCode = newCode;
 			}
-			if (patternSize + newNumber > maxPatternSize) {
-				newNumber = maxPatternSize - patternSize;
-			}
-			pattern += ` ${newCode}${newNumber}`;
-			patternSize += newNumber;
 		}
 
 		colorString = pattern;

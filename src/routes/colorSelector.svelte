@@ -23,7 +23,7 @@
         background-color: #${options[activeIndex]}
       `}
 		/>
-		<select value={activeIndex} on:change={getNewPaletteColor}>
+		<select value={activeIndex} on:change={getNewPaletteColor} disabled={options.length < 2}>
 			{#each options as color, i}
 				<option value={i}>
 					#{color}
