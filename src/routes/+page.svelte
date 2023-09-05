@@ -1,10 +1,5 @@
 <script lang="ts">
-	import { afterUpdate, onMount } from 'svelte';
-
-	let canvas: HTMLCanvasElement;
-
-	const size = 640;
-	const step = 2;
+	import TartanCanvas from './tartanCanvas.svelte';
 
 	const paletteLabels: { [key: string]: string } = {
 		LR: 'light red',
@@ -107,15 +102,14 @@
 		DT: ['4C3428', '441800', '230D00']
 	};
 
-	function makeChunk(length: number, colorCode: string): string[] {
-		const chunk = new Array(length).fill(colorCode);
+	function makeChunk(length: number, colorHex: string): string[] {
+		const chunk = new Array(length).fill(colorHex);
 		return chunk;
 	}
 
-	const validColorCodes = Object.keys(palette);
+	const validColorCodes: string[] = Object.keys(palette);
 
-	// TODO: make this user-editable (select which color in the palette is used for e.g. "blue")
-	let activePaletteIndices: { [key: string]: number } = {};
+	const activePaletteIndices: { [key: string]: number } = {};
 	for (const color of validColorCodes) {
 		activePaletteIndices[color] = 0;
 	}
@@ -128,14 +122,16 @@
 		}
 	}
 
-	function makeColors(colorsText: string): string[] {
+	function makeThreadList(colorsText: string, activePalette: { [key: string]: number }): string[] {
 		const segments = colorsText.split(' ');
 		let retval: string[] = [];
 		for (const segment of segments) {
 			const color = makeColor(segment);
 			if (color !== undefined) {
 				const [threadCount, colorCode] = color;
-				retval = retval.concat(makeChunk(threadCount, colorCode));
+				retval = retval.concat(
+					makeChunk(threadCount, palette[colorCode][activePalette[colorCode]])
+				);
 			}
 		}
 		return retval;
@@ -143,90 +139,7 @@
 
 	// Demo is the standard Black Watch pattern
 	let colorString = 'B24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B4';
-	$: colors = makeColors(colorString);
-
-	type Thread = {
-		start: [number, number];
-		end: [number, number];
-		color: string;
-	};
-
-	const repaint = () => {
-		const ctx = canvas.getContext('2d');
-
-		if (ctx) {
-			const topThreads: Thread[] = [];
-			const bottomThreads: Thread[] = [];
-			const multiplier = size / colors.length;
-			const lineWidth = size / colors.length - 1;
-			ctx.fillStyle = 'black';
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-			function generateVertThreads(colorCode: string, index: number) {
-				const x = index * multiplier + multiplier / 2;
-				const topStartPoint = (index % 4) - 4;
-				const color = palette[colorCode][activePaletteIndices[colorCode]];
-				let rawY = topStartPoint;
-				while (rawY < colors.length) {
-					const subthread: Thread = {
-						start: [x, rawY * multiplier],
-						end: [x, (rawY + step) * multiplier],
-						color
-					};
-					(rawY - topStartPoint) % (step * 2) === 0
-						? topThreads.push(subthread)
-						: bottomThreads.push(subthread);
-					rawY += step;
-				}
-			}
-
-			function generateHorizThreads(colorCode: string, index: number) {
-				const y = index * multiplier + multiplier / 2;
-				const leftStartPoint = (index % 4) - 3;
-				let rawX = leftStartPoint;
-				const color = palette[colorCode][activePaletteIndices[colorCode]];
-				while (rawX < colors.length) {
-					const subthread: Thread = {
-						start: [rawX * multiplier, y],
-						end: [(rawX + step) * multiplier, y],
-						color
-					};
-					(rawX - leftStartPoint) % (step * 2) === 0
-						? topThreads.push(subthread)
-						: bottomThreads.push(subthread);
-					rawX += step;
-				}
-			}
-
-			colors.forEach(generateVertThreads);
-			colors.forEach(generateHorizThreads);
-
-			bottomThreads.forEach(({ start, end, color }) => {
-				ctx.beginPath();
-				ctx.moveTo(...start);
-				ctx.lineTo(...end);
-				ctx.lineWidth = lineWidth;
-				ctx.strokeStyle = `#${color}ee`;
-				ctx.stroke();
-			});
-
-			topThreads.forEach(({ start, end, color }) => {
-				ctx.beginPath();
-				ctx.moveTo(...start);
-				ctx.lineTo(...end);
-				ctx.lineWidth = lineWidth;
-				ctx.strokeStyle = `#${color}`;
-				ctx.stroke();
-			});
-		}
-	};
-
-	onMount(() => {
-		repaint();
-	});
-
-	afterUpdate(() => {
-		repaint();
-	});
+	$: threadList = makeThreadList(colorString, activePaletteIndices);
 
 	function setPaletteColor(e: Event, colorCode: string) {
 		const target = e.target as HTMLSelectElement;
@@ -252,9 +165,12 @@
 	<div id="main">
 		<div id="palette">
 			<h2>Palette</h2>
-			{#each Object.keys(activePaletteIndices) as colorCode}
+			{#each Object.keys(palette) as colorCode}
 				<div>
-					<label class={colors.indexOf(colorCode) !== -1 ? 'used' : 'unused'}
+					<label
+						class={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1
+							? 'used'
+							: 'unused'}
 						>{paletteLabels[colorCode]} ({colorCode}):
 						<div
 							class="color-preview"
@@ -268,7 +184,7 @@
 						>
 							{#each palette[colorCode] as color, i}
 								<option value={i}>
-									#{palette[colorCode][i]}
+									#{color}
 								</option>
 							{/each}
 						</select>
@@ -277,7 +193,7 @@
 			{/each}
 		</div>
 
-		<canvas bind:this={canvas} height={size} width={size} />
+		<TartanCanvas {threadList} />
 	</div>
 </section>
 
@@ -338,9 +254,5 @@
 	.color-preview {
 		height: 1em;
 		width: 1em;
-	}
-
-	canvas {
-		background: white;
 	}
 </style>
