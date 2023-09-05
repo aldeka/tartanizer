@@ -278,7 +278,7 @@
       const topThreads: Thread[] = [];
       const bottomThreads: Thread[] = [];
       const multiplier = size / colors.length;
-      const lineWidth = (size / colors.length) - 2;
+      const lineWidth = (size / colors.length) - 1;
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       function generateVertThreads(colorCode: string, index: number) {
