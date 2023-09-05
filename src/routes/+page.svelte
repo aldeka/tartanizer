@@ -311,10 +311,6 @@
       };
 
       colors.forEach(generateVertThreads);
-      // generateVertThreads(vertThreadColors[0], 0);
-      // generateVertThreads(vertThreadColors[1], 1);
-      // generateVertThreads(vertThreadColors[2], 2);
-      // generateVertThreads(vertThreadColors[3], 3);
       colors.forEach(generateHorizThreads);
 
       bottomThreads.forEach(({ start, end, color }) => {
