@@ -349,8 +349,12 @@
 
 <section>
   <h1>
-    hi
+    Tartan simulator
   </h1>
+
+  <label>pattern
+    <input type="text" bind:value={colorString} />
+  </label>
 
   <canvas bind:this={canvas} height={size} width={size} />
 </section>
@@ -365,6 +369,15 @@
   }
 
   h1 {
+    width: 100%;
+  }
+
+  label {
+    text-align: left;
+    width: 100%;
+  }
+
+  label input {
     width: 100%;
   }
 
