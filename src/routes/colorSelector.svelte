@@ -34,20 +34,21 @@
 </div>
 
 <style>
-	label.unused {
-		color: #888;
-	}
-
-	label.used {
-		color: #000;
-		font-weight: 700;
-	}
-
 	label {
 		display: flex;
 		flex-direction: row;
 		justify-content: flex-end;
+
+		&.used {
+			color: #000;
+			font-weight: 700;
+		}
+
+		&.unused {
+			color: #666;
+		}
 	}
+
 	select {
 		width: 6em;
 		font-family: monospace;

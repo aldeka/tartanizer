@@ -188,16 +188,16 @@
 	<h1>Tartan simulator</h1>
 
 	<section id="pattern-spec">
-		<label
-			>pattern
-			<input type="text" bind:value={colorString} />
-		</label>
-		<button on:click={randomizePattern}>I'm feeling lucky</button>
+		<div class="pattern-input">
+			<label for="pattern">Pattern </label>
+			<input name="pattern" type="text" bind:value={colorString} />
+		</div>
+		<button class="stripey-button" on:click={randomizePattern}>I'm feeling lucky</button>
 	</section>
 
 	<main>
 		<section id="palette">
-			<h2>Palette</h2>
+			<h3>Palette</h3>
 			{#each Object.keys(palette) as colorCode}
 				<ColorSelector
 					used={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1}
@@ -221,48 +221,53 @@
 		justify-content: center;
 		align-items: stretch;
 		font-size: 16px;
-	}
 
-	section#wrapper * {
-		box-sizing: border-box;
+		& * {
+			box-sizing: border-box;
+		}
 	}
 
 	h1 {
 		width: 100%;
+		font-size: 2em;
 	}
 
 	section#pattern-spec {
 		display: flex;
 		align-items: flex-end;
 		margin-bottom: 0.5em;
+		font-size: 18px;
+
+		& input,
+		& button {
+			max-height: 3em;
+			min-height: 3em;
+			font-size: 24px;
+		}
 	}
 
-	label {
+	.pattern-input {
 		text-align: left;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
 		margin-right: 1em;
+
+		& input {
+			padding: 0 0.5em;
+			border-color: black;
+			border-radius: 0.25em;
+		}
 	}
 
-	input,
-	button {
-		max-height: 3em;
-		min-height: 3em;
-	}
-
-	label input {
-		padding: 0 0.5em;
-	}
-
-	button {
+	.stripey-button {
 		cursor: pointer;
 		display: block;
 		flex: 0;
-		min-width: 180px;
+		min-width: 240px;
 		border-radius: 0.25em;
-		font-weight: 900;
+		font-weight: 600;
 
 		background: #fff
 			repeating-linear-gradient(
@@ -286,11 +291,25 @@
 				#a0a0a066 16px,
 				#4c342866 18px
 			);
+
+		background-size: 400% 100%;
+		animation-name: slider;
+		animation-duration: 20s;
+		animation-timing-function: linear;
+		animation-delay: 0s;
+		animation-iteration-count: infinite;
+		animation-direction: normal;
+		animation-play-state: paused;
+
+		&:hover {
+			animation-play-state: running;
+		}
 	}
 
-	h2 {
-		font-size: 24px;
-		margin: 0;
+	@keyframes slider {
+		0% {
+			background-position: 100% 0%;
+		}
 	}
 
 	main {
@@ -299,5 +318,14 @@
 		flex-direction: row;
 		align-items: flex-start;
 		justify-content: space-between;
+	}
+
+	h3,
+	label {
+		font-weight: 400;
+		margin: 0;
+		margin-bottom: 0.25em;
+		font-size: 16px;
+		color: #333;
 	}
 </style>
