@@ -328,4 +328,8 @@
 		font-size: 16px;
 		color: #333;
 	}
+
+	section#palette {
+		margin-top: 1em;
+	}
 </style>
