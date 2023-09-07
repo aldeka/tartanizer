@@ -1,8 +1,7 @@
 :root {
-	--font-body: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-		sans-serif;
-	--color-bg-1: #dfdfd0;
-	--color-theme-1: #4075a6;
+	--font-body: 'Poppins', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+		'Helvetica Neue', sans-serif;
+	--color-theme-1: #295884;
 	--color-text: #111119;
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
@@ -14,13 +13,13 @@ body {
 	min-height: 100vh;
 	margin: 0;
 	background-attachment: fixed;
-	background-color: var(--color-bg-1);
+	background-color: #dfdfd0;
 	background: repeating-linear-gradient(
 		-120deg,
-		#10100011,
-		#00000000 2px,
-		#00000000 2px,
-		#10100011 4px
+		#10100030,
+		#10100021 2px,
+		#10100021 2px,
+		#10100030 4px
 	);
 }
 

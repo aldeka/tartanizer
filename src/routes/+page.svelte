@@ -185,20 +185,33 @@
 </svelte:head>
 
 <div id="wrapper">
-	<h1>Tartan simulator</h1>
+	<h1>tartan simulator</h1>
 
 	<section id="pattern-spec">
 		<div class="pattern-input">
-			<label for="pattern">Pattern </label>
+			<label for="pattern"
+				>pattern <a
+					href="https://www.tartanregister.gov.uk/threadcount"
+					target="_blank"
+					class="help">(color code, then thread count)</a
+				></label
+			>
 			<input id="pattern" name="pattern" type="text" bind:value={colorString} />
 		</div>
 		<button class="stripey-button" title="Get a random tartan pattern" on:click={randomizePattern}
-			>I'm feeling lucky</button
+			>i'm feeling lucky</button
 		>
 	</section>
 
 	<div id="canvas-and-palette">
-		<TartanCanvas {threadList} />
+		<div>
+			<TartanCanvas {threadList} />
+			<footer>
+				<a href="https://github.com/aldeka/tartanizer" target="_blank">made with {'<3'}</a> by
+				<a href="https://github.com/aldeka" target="_blank">aldeka</a>
+				and <a href="https://github.com/zarvox" target="_blank">zarvox</a>
+			</footer>
+		</div>
 		<section id="palette">
 			<h3>Palette</h3>
 			{#each Object.keys(palette) as colorCode}
@@ -222,6 +235,10 @@
 		justify-content: center;
 		align-items: stretch;
 		font-size: 16px;
+	}
+
+	.help {
+		font-size: 12px;
 	}
 
 	h1 {
@@ -249,7 +266,7 @@
 	.pattern-input {
 		text-align: left;
 		flex: 0;
-		min-width: 640px;
+		min-width: 648px;
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
@@ -267,32 +284,35 @@
 		display: block;
 		flex: 1;
 		min-width: 240px;
-		border-radius: 0.25em;
-		font-weight: 600;
 		margin-left: 2rem;
+		border-radius: 0.25em;
 		border-color: #111119;
+		color: black;
+		font-weight: 900;
+		text-shadow: -2px 2px 0 #fff, -3px 0 0 #fff, 3px 0 0 #fff, 2px 2px 0 #fff, 2px -2px 0 #fff,
+			-2px -2px 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff;
 
 		background: #fff
 			repeating-linear-gradient(
 				120deg,
-				#bcc3d244,
-				#2c408444 2px,
-				#50505044 2px,
-				#5a008c44 4px,
-				#98c8e844 4px,
-				#a0000044 6px,
-				#781c3844 6px,
-				#40806044 8px,
-				#be783244 8px,
-				#98481c44 10px,
-				#44004444 10px,
-				#e0a12644 12px,
-				#78948444 12px,
-				#c8c8c844 14px,
-				#00544844 14px,
-				#10101044 16px,
-				#a0a0a044 16px,
-				#4c342844 18px
+				#bcc3d2bb,
+				#2c4084bb 2px,
+				#505050bb 2px,
+				#5a008cbb 4px,
+				#98c8e8bb 4px,
+				#a00000bb 6px,
+				#781c38bb 6px,
+				#408060bb 8px,
+				#be7832bb 8px,
+				#98481cbb 10px,
+				#440044bb 10px,
+				#e0a126bb 12px,
+				#789484bb 12px,
+				#c8c8c8bb 14px,
+				#005448bb 14px,
+				#101010bb 16px,
+				#a0a0a0bb 16px,
+				#4c3428bb 18px
 			);
 
 		background-size: 400% 100%;
@@ -306,8 +326,7 @@
 
 		&:hover {
 			animation-play-state: running;
-			box-shadow: 0 0 1px #ffffff, 1px 2px 8px #ffffff99, -1px -2px 16px #ffffff66,
-				0 0 4px #ffffdd66;
+			box-shadow: 1px 2px 8px #00000033, -1px -3px 16px #00000011, 0 0 4px #ddddff33;
 		}
 	}
 
@@ -321,29 +340,32 @@
 		width: 100%;
 		display: flex;
 		flex-direction: row;
-		align-items: flex-start;
+		align-items: stretch;
 		justify-content: space-between;
+		max-height: 640px;
 	}
 
 	label {
 		font-weight: 400;
 		margin: 0;
 		margin-bottom: 0.25em;
-		font-size: 16px;
+		font-size: 18px;
 	}
 
 	section#palette {
 		flex: 1;
-		margin-top: 1rem;
-		margin-left: 4rem;
+		margin-left: 2rem;
 		min-width: 240px;
+		height: 100%;
+		overflow-y: auto;
 
-		padding: 1em 0 1.5em 0;
-		background: white;
+		padding: 0.5em 0 1.5em 0;
+		background: #ffffff99;
 		border-radius: 0.25em;
 
 		& h3 {
-			margin: 0 0 0.5rem 1rem;
+			margin: 0 0 0.25rem 1rem;
+			font-weight: 400;
 		}
 	}
 </style>

@@ -14,8 +14,8 @@
 	}
 </script>
 
-<div class={used ? 'color-picker used' : 'color-picker unused'}>
-	<div class="color-label" title={label}>{code}</div>
+<div class:used class="color-picker" title={label}>
+	<div class="color-label">{code}</div>
 	<div class="options">
 		{#each options as color, i}
 			<label
@@ -41,27 +41,29 @@
 
 <style>
 	.color-picker {
-		padding: 0.5rem 1rem 0 1rem;
+		margin: 0;
+		padding: 0.75rem 1rem 0.25rem 1rem;
 		font-size: 12px;
 		display: flex;
+		color: #667;
 
 		&.used {
+			background-color: white;
 			color: #000;
-			font-weight: 700;
-			background-color: #eef;
-		}
 
-		&.unused {
-			color: #667;
+			& .color-label {
+				font-weight: 700;
+			}
 		}
 	}
 
 	.color-label {
 		display: block;
 		font-size: 24px;
+		font-weight: 300;
 		line-height: 24px;
-		min-width: 1.2em;
-		max-width: 1.2em;
+		min-width: 1.4em;
+		max-width: 1.4em;
 	}
 
 	.options {
@@ -74,8 +76,8 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			height: 2.75em;
-			width: 4em;
+			height: 2rem;
+			width: 2.5rem;
 			border: 1pt solid black;
 
 			&.active {

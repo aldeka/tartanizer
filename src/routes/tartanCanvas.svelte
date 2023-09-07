@@ -95,5 +95,6 @@
 <style>
 	canvas {
 		background: black;
+		border: 4px solid black;
 	}
 </style>
