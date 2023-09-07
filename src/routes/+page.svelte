@@ -198,8 +198,10 @@
 			>
 			<input id="pattern" name="pattern" type="text" bind:value={colorString} />
 		</div>
-		<button class="stripey-button" title="Get a random tartan pattern" on:click={randomizePattern}
-			>i'm feeling lucky</button
+		<button
+			class="stripey-button"
+			title="generate a random tartan pattern"
+			on:click={randomizePattern}>i'm feeling lucky</button
 		>
 	</section>
 
