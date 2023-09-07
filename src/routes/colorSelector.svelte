@@ -14,48 +14,89 @@
 	}
 </script>
 
-<div>
-	<label class={used ? 'used' : 'unused'}
-		>{label} ({code}):
-		<div
-			class="color-preview"
-			style={`
-        background-color: #${options[activeIndex]}
-      `}
-		/>
-		<select value={activeIndex} on:change={getNewPaletteColor} disabled={options.length < 2}>
-			{#each options as color, i}
-				<option value={i}>
-					#{color}
-				</option>
-			{/each}
-		</select>
-	</label>
+<div class={used ? 'color-picker used' : 'color-picker unused'}>
+	<div class="color-label" title={label}>{code}</div>
+	<div class="options">
+		{#each options as color, i}
+			<label
+				for={color}
+				class:disabled={options.length < 2}
+				class:active={color === options[activeIndex]}
+				style={`background: #${color};`}
+				title={`#${color}`}
+			>
+				<input
+					type="radio"
+					id={color}
+					value={i}
+					name={`${code}-hue`}
+					checked={color === options[activeIndex]}
+					on:change={getNewPaletteColor}
+					disabled={options.length < 2}
+				/>
+			</label>
+		{/each}
+	</div>
 </div>
 
 <style>
-	label {
+	.color-picker {
+		padding: 0.5rem 1rem 0 1rem;
+		font-size: 12px;
 		display: flex;
-		flex-direction: row;
-		justify-content: flex-end;
 
 		&.used {
 			color: #000;
 			font-weight: 700;
+			background-color: #eef;
 		}
 
 		&.unused {
-			color: #666;
+			color: #667;
 		}
 	}
 
-	select {
-		width: 6em;
-		font-family: monospace;
+	.color-label {
+		display: block;
+		font-size: 24px;
+		line-height: 24px;
+		min-width: 1.2em;
+		max-width: 1.2em;
 	}
 
-	.color-preview {
-		height: 1em;
-		width: 1em;
+	.options {
+		display: flex;
+		margin-left: 1.25rem;
+		flex-wrap: wrap;
+
+		& label {
+			margin: 0 0.25em 0.5em 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 2.75em;
+			width: 4em;
+			border: 1pt solid black;
+
+			&.active {
+				box-shadow: 0px 0px 0px 2px rgb(10, 90, 255);
+			}
+
+			&:not(.disabled) {
+				cursor: pointer;
+
+				&:hover:not(.active) {
+					box-shadow: 0px 0px 0px 2px #bbb;
+				}
+
+				& input {
+					cursor: pointer;
+				}
+			}
+
+			& input {
+				margin: 0;
+			}
+		}
 	}
 </style>

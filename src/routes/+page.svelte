@@ -34,49 +34,49 @@
 		// Selected from among the many options at https://www.tartanregister.gov.uk/docs/Colour_shades.pdf
 		// See paletteLabels for names
 		LR: ['F4CCCC', 'E87878', 'F04DB0'],
-		R: ['A00048', 'FA4B00', 'FF0000', 'DC0000', 'C80000', 'C82828', 'C8002C', 'B03000'],
-		DR: ['A00000', '960000', '960000', '880000', '800028', '781C38', '4C0000', '901C38', '680028'],
+		R: ['A00048', 'DC0000', 'C80000', 'C82828', 'C8002C', 'B03000', 'FA4B00', 'FF0000'],
+		DR: ['A00000', '960000', '880000', '800028', '781C38', '4C0000', '901C38', '680028'],
 		O: ['EC8048', 'E86000', 'FF5000', 'DC943C', 'D87C00'],
 		DO: ['BE7832'],
 		LY: ['F9F5C8', 'F8E38C'],
 		Y: ['FFFF00', 'FFE600', 'FFD700', 'FCCC00', 'E0A126', 'E8C000', 'D8B000'],
 		DY: ['BC8C00', 'C89800', 'C88C00'],
-		LG: ['789484', 'C4BC68', '9C9C00', 'ACD74A', '86C67C', '649848'],
+		LG: ['789484', '649848', '86C67C', 'ACD74A', 'C4BC68', '9C9C00'],
 		G: [
 			'008B00',
-			'408060',
 			'289C18',
+			'408060',
 			'006400',
 			'007800',
 			'3F5642',
-			'767E52',
-			'5C6428',
 			'00643C',
 			'146400',
 			'006818',
 			'004C00',
 			'285800',
 			'005020',
-			'005448'
+			'005448',
+			'767E52',
+			'5C6428'
 		],
 		DG: ['003C14', '003820', '004028', '002814'],
-		LB: ['BCC3D2', '98C8E8', '82CFFD', '00FCFC'],
+		LB: ['98C8E8', 'BCC3D2', '82CFFD', '00FCFC'],
 		B: [
 			'2C4084',
 			'1870A4',
 			'1474B4',
+			'0596FA',
+			'2474E8',
+			'788CB4',
+			'5F749C',
+			'0000CD',
+			'0000FF',
+			'3850C8',
+			'2888C4',
 			'048888',
 			'3C82AF',
 			'5C8CA8',
-			'2888C4',
-			'48A4C0',
-			'2474E8',
-			'0596FA',
-			'0000FF',
-			'3850C8',
-			'788CB4',
-			'5F749C',
-			'0000CD'
+			'48A4C0'
 		],
 		DB: [
 			'055183',
@@ -91,9 +91,9 @@
 			'1C1C50'
 		],
 		LP: ['A8ACE8', 'C49CD8', '806D84', '9C68A4'],
-		P: ['9058D8', 'AA00FF', 'B458AC', '6C0070', '5A008C', '64008C', '780078'],
+		P: ['9058D8', '64008C', '5A008C', 'AA00FF', 'B458AC', '6C0070', '780078'],
 		DP: ['440044', '1E0948'],
-		W: ['FFFFFF', 'E5DDD1', 'E8CCB8', 'F0E0C8', 'FCFCFC', 'F8F8F8'],
+		W: ['FFFFFF', 'FCFCFC', 'F8F8F8', 'E5DDD1', 'E8CCB8', 'F0E0C8'],
 		LN: ['E0E0E0'],
 		N: ['C8C8C8', 'C0C0C0', 'B0B0B0', 'A0A0A0', '808080', '888888', '646464'],
 		DN: ['505050', '555A64', '1C1714', '14283C', '1C1C1C'],
@@ -184,18 +184,21 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<section id="wrapper">
+<div id="wrapper">
 	<h1>Tartan simulator</h1>
 
 	<section id="pattern-spec">
 		<div class="pattern-input">
 			<label for="pattern">Pattern </label>
-			<input name="pattern" type="text" bind:value={colorString} />
+			<input id="pattern" name="pattern" type="text" bind:value={colorString} />
 		</div>
-		<button class="stripey-button" on:click={randomizePattern}>I'm feeling lucky</button>
+		<button class="stripey-button" title="Get a random tartan pattern" on:click={randomizePattern}
+			>I'm feeling lucky</button
+		>
 	</section>
 
-	<main>
+	<div id="canvas-and-palette">
+		<TartanCanvas {threadList} />
 		<section id="palette">
 			<h3>Palette</h3>
 			{#each Object.keys(palette) as colorCode}
@@ -209,32 +212,29 @@
 				/>
 			{/each}
 		</section>
-
-		<TartanCanvas {threadList} />
-	</main>
-</section>
+	</div>
+</div>
 
 <style>
-	section#wrapper {
+	#wrapper {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: stretch;
 		font-size: 16px;
-
-		& * {
-			box-sizing: border-box;
-		}
 	}
 
 	h1 {
 		width: 100%;
 		font-size: 2em;
+		color: #111119;
+		font-weight: 900;
 	}
 
 	section#pattern-spec {
 		display: flex;
 		align-items: flex-end;
+		justify-content: space-between;
 		margin-bottom: 0.5em;
 		font-size: 18px;
 
@@ -248,15 +248,16 @@
 
 	.pattern-input {
 		text-align: left;
-		flex: 1;
+		flex: 0;
+		min-width: 640px;
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
-		margin-right: 1em;
+		margin: 0;
 
 		& input {
 			padding: 0 0.5em;
-			border-color: black;
+			border-color: #111119;
 			border-radius: 0.25em;
 		}
 	}
@@ -264,37 +265,39 @@
 	.stripey-button {
 		cursor: pointer;
 		display: block;
-		flex: 0;
+		flex: 1;
 		min-width: 240px;
 		border-radius: 0.25em;
 		font-weight: 600;
+		margin-left: 2rem;
+		border-color: #111119;
 
 		background: #fff
 			repeating-linear-gradient(
 				120deg,
-				#bcc3d266,
-				#2c408466 2px,
-				#50505066 2px,
-				#5a008c66 4px,
-				#98c8e866 4px,
-				#a0000066 6px,
-				#781c3866 6px,
-				#40806066 8px,
-				#be783266 8px,
-				#98481c66 10px,
-				#44004466 10px,
-				#e0a12666 12px,
-				#78948466 12px,
-				#c8c8c866 14px,
-				#00544866 14px,
-				#10101066 16px,
-				#a0a0a066 16px,
-				#4c342866 18px
+				#bcc3d244,
+				#2c408444 2px,
+				#50505044 2px,
+				#5a008c44 4px,
+				#98c8e844 4px,
+				#a0000044 6px,
+				#781c3844 6px,
+				#40806044 8px,
+				#be783244 8px,
+				#98481c44 10px,
+				#44004444 10px,
+				#e0a12644 12px,
+				#78948444 12px,
+				#c8c8c844 14px,
+				#00544844 14px,
+				#10101044 16px,
+				#a0a0a044 16px,
+				#4c342844 18px
 			);
 
 		background-size: 400% 100%;
 		animation-name: slider;
-		animation-duration: 20s;
+		animation-duration: 30s;
 		animation-timing-function: linear;
 		animation-delay: 0s;
 		animation-iteration-count: infinite;
@@ -303,6 +306,8 @@
 
 		&:hover {
 			animation-play-state: running;
+			box-shadow: 0 0 1px #ffffff, 1px 2px 8px #ffffff99, -1px -2px 16px #ffffff66,
+				0 0 4px #ffffdd66;
 		}
 	}
 
@@ -312,7 +317,7 @@
 		}
 	}
 
-	main {
+	#canvas-and-palette {
 		width: 100%;
 		display: flex;
 		flex-direction: row;
@@ -320,16 +325,25 @@
 		justify-content: space-between;
 	}
 
-	h3,
 	label {
 		font-weight: 400;
 		margin: 0;
 		margin-bottom: 0.25em;
 		font-size: 16px;
-		color: #333;
 	}
 
 	section#palette {
-		margin-top: 1em;
+		flex: 1;
+		margin-top: 1rem;
+		margin-left: 4rem;
+		min-width: 240px;
+
+		padding: 1em 0 1.5em 0;
+		background: white;
+		border-radius: 0.25em;
+
+		& h3 {
+			margin: 0 0 0.5rem 1rem;
+		}
 	}
 </style>
