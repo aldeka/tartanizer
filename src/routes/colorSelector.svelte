@@ -22,7 +22,11 @@
 				for={color}
 				class:disabled={options.length < 2}
 				class:active={color === options[activeIndex]}
-				style={`background: #${color};`}
+				style={`background: #${color};${
+					color === options[activeIndex] &&
+					['LR', 'R', 'DR', 'O', 'DO', 'LY', 'Y', 'DY'].indexOf(code) !== -1 &&
+					'box-shadow: 0px 0px 0px 3px blue'
+				}`}
 				title={`#${color}`}
 			>
 				<input
@@ -72,7 +76,7 @@
 		flex-wrap: wrap;
 
 		& label {
-			margin: 0 0.25em 0.5em 0;
+			margin: 0 0.5em 0.5em 0;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -81,23 +85,20 @@
 			border: 1pt solid black;
 
 			&.active {
-				box-shadow: 0px 0px 0px 2px rgb(10, 90, 255);
+				box-shadow: 0px 0px 0px 3px orange;
 			}
 
 			&:not(.disabled) {
 				cursor: pointer;
 
 				&:hover:not(.active) {
-					box-shadow: 0px 0px 0px 2px #bbb;
-				}
-
-				& input {
-					cursor: pointer;
+					box-shadow: 0px 0px 0px 3px #bbb;
 				}
 			}
 
-			& input {
-				margin: 0;
+			& input[type='radio'] {
+				position: absolute;
+				left: -9999px;
 			}
 		}
 	}

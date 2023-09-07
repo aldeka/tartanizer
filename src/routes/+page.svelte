@@ -254,7 +254,7 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: space-between;
-		margin-bottom: 0.5em;
+		margin-bottom: 2rem;
 		font-size: 18px;
 
 		& input,
@@ -356,9 +356,9 @@
 
 	section#palette {
 		flex: 1;
-		margin-left: 2rem;
+		margin: 1rem 1rem 0 2rem;
 		min-width: 240px;
-		height: 100%;
+		height: 616px;
 		overflow-y: auto;
 
 		padding: 0.5em 0 1.5em 0;
