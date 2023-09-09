@@ -148,10 +148,13 @@
 		}
 	}
 
-	type PivotFormat = "none" | "half" | "full";
+	type PivotFormat = 'none' | 'half' | 'full';
 	function makeThreadList(
-		colorsText: string, activePalette: { [key: string]: number },
-		repetitions: number, pivotFormat: PivotFormat): string[] {
+		colorsText: string,
+		activePalette: { [key: string]: number },
+		repetitions: number,
+		pivotFormat: PivotFormat
+	): string[] {
 		const segments = colorsText.trim().split(' ');
 		let validStripes: Stripe[] = [];
 		let sett: string[] = [];
@@ -162,24 +165,22 @@
 			}
 		}
 
-		let settStripes;
-		if (pivotFormat === "none") {
+		let settStripes: Stripe[] = [];
+		if (pivotFormat === 'none') {
 			settStripes = validStripes;
-		} else if (pivotFormat === "half") {
-			settStripes = validStripes.concat(validStripes.toReversed());
-		} else if (pivotFormat === "full") {
-			settStripes = validStripes.concat(validStripes.slice(1, -1).toReversed());
+		} else if (pivotFormat === 'half') {
+			settStripes = validStripes.concat(validStripes.reverse());
+		} else if (pivotFormat === 'full') {
+			settStripes = validStripes.concat(validStripes.slice(1, -1).reverse());
 		}
 
 		for (const stripe of settStripes) {
 			const { colorCode, threadCount } = stripe;
-			sett = sett.concat(
-				makeChunk(threadCount, palette[colorCode][activePalette[colorCode]])
-			);
+			sett = sett.concat(makeChunk(threadCount, palette[colorCode][activePalette[colorCode]]));
 		}
 
 		let retval: string[] = [];
-		for (let i = 0 ; i < repetitions ; i++) {
+		for (let i = 0; i < repetitions; i++) {
 			retval = retval.concat(sett);
 		}
 		return retval;
@@ -188,7 +189,7 @@
 	// Demo is the standard Black Watch pattern
 	let colorString = 'B24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B4';
 	let repetitions = 1;
-	let pivotFormat: PivotFormat = "half";
+	let pivotFormat: PivotFormat = 'half';
 	$: threadList = makeThreadList(colorString, activePaletteIndices, repetitions, pivotFormat);
 
 	function setPaletteColor(colorCode: string, index: number) {
@@ -251,40 +252,98 @@
 <h1>tartan simulator</h1>
 
 <section id="pattern-spec">
-	<div class="pattern-input">
-		<label for="pattern"
-			>pattern <a href="https://www.tartanregister.gov.uk/threadcount" target="_blank" class="help"
-				>(color code, then thread count)</a
-			></label
+	<div class="input-and-button">
+		<div class="pattern-input">
+			<label for="pattern"
+				>pattern <a
+					href="https://www.tartanregister.gov.uk/threadcount"
+					target="_blank"
+					class="help">(color code, then thread count)</a
+				></label
+			>
+			<input id="pattern" name="pattern" type="text" bind:value={colorString} />
+		</div>
+		<button
+			class="stripey-button"
+			title="generate a random tartan pattern"
+			on:click={randomizePattern}>i'm feeling lucky</button
 		>
-		<input id="pattern" name="pattern" type="text" bind:value={colorString} />
 	</div>
-	<button
-		class="stripey-button"
-		title="generate a random tartan pattern"
-		on:click={randomizePattern}>i'm feeling lucky</button
-	>
+	<div id="pivot-and-repetition" class="help">
+		<div id="pivot-options" class="display-options">
+			pivot:
+			<label for="half"
+				><input
+					id="half"
+					type="radio"
+					checked={pivotFormat === 'half'}
+					on:change={() => {
+						setPivot('half');
+					}}
+				/>half-pivot</label
+			>
+			<label for="full"
+				><input
+					id="full"
+					type="radio"
+					checked={pivotFormat === 'full'}
+					on:change={() => {
+						setPivot('full');
+					}}
+				/>
+				full-pivot</label
+			>
+			<label for="none"
+				><input
+					id="none"
+					type="radio"
+					checked={pivotFormat === 'none'}
+					on:change={() => {
+						setPivot('none');
+					}}
+				/>
+				asymmetric</label
+			>
+		</div>
+
+		<div id="repetitions" class="display-options">
+			repetitions:
+			<label for="one"
+				><input
+					id="one"
+					type="radio"
+					checked={repetitions === 1}
+					on:change={() => {
+						setRepeat(1);
+					}}
+				/>
+				1x</label
+			>
+			<label for="two"
+				><input
+					id="two"
+					type="radio"
+					checked={repetitions === 2}
+					on:change={() => {
+						setRepeat(2);
+					}}
+				/>
+				2x</label
+			>
+			<label for="three"
+				><input
+					id="three"
+					type="radio"
+					checked={repetitions === 3}
+					on:change={() => {
+						setRepeat(3);
+					}}
+				/>
+				3x</label
+			>
+		</div>
+	</div>
 </section>
-<div id="pivot-and-repetition">
-	<button
-		title="pattern is half pivot"
-		on:click={() => { setPivot("half"); }}>B/8</button>
-	<button
-		title="pattern is full pivot"
-		on:click={() => { setPivot("full"); }}>/B8</button>
-	<button
-		title="repeat exact pattern"
-		on:click={() => { setPivot("none"); }}>...</button>
-	<button
-		title="display one sett"
-		on:click={() => { setRepeat(1); }}>1x</button>
-	<button
-		title="display two setts"
-		on:click={() => { setRepeat(2); }}>2x</button>
-	<button
-		title="display three setts"
-		on:click={() => { setRepeat(3); }}>3x</button>
-</div>
 
 <div id="canvas-and-palette">
 	<div>
@@ -342,16 +401,21 @@
 	section#pattern-spec {
 		flex: 0;
 		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
+		flex-direction: column;
 		margin-bottom: 2rem;
-		font-size: 18px;
 
-		& input,
-		& button {
-			max-height: 3em;
-			min-height: 3em;
-			font-size: 24px;
+		& .input-and-button {
+			display: flex;
+			align-items: flex-end;
+			justify-content: space-between;
+			font-size: 18px;
+
+			& input,
+			& .stripey-button {
+				max-height: 3em;
+				min-height: 3em;
+				font-size: 24px;
+			}
 		}
 	}
 
@@ -363,10 +427,29 @@
 		align-items: stretch;
 		margin: 0;
 
+		& label {
+			font-weight: 400;
+			margin: 0;
+			font-size: 18px;
+			margin-bottom: 0.25rem;
+		}
+
 		& input {
 			padding: 0 0.5em;
 			border-color: #111119;
 			border-radius: 0.25em;
+		}
+	}
+
+	#pivot-and-repetition {
+		margin-top: 0.25rem;
+		display: flex;
+		align-items: flex-start;
+
+		& .display-options {
+			display: flex;
+			align-items: flex-start;
+			margin-right: 1rem;
 		}
 	}
 
@@ -435,13 +518,6 @@
 		align-items: stretch;
 		justify-content: space-between;
 		max-height: 640px;
-	}
-
-	label {
-		font-weight: 400;
-		margin: 0;
-		margin-bottom: 0.25em;
-		font-size: 18px;
 	}
 
 	section#palette {
