@@ -116,10 +116,10 @@
 	}
 
 	const colorRe = new RegExp(`(${validColorCodes.join('|')})(\\d+)`);
-	function makeColor(c: string): [number, string] | undefined {
+	function makeColor(c: string): [string, number] | undefined {
 		const m = c.match(colorRe);
 		if (m) {
-			return [parseInt(m[2], 10), m[1]];
+			return [m[1], parseInt(m[2], 10)];
 		}
 	}
 
@@ -129,7 +129,7 @@
 		for (const segment of segments) {
 			const color = makeColor(segment);
 			if (color !== undefined) {
-				const [threadCount, colorCode] = color;
+				const [colorCode, threadCount] = color;
 				retval = retval.concat(
 					makeChunk(threadCount, palette[colorCode][activePalette[colorCode]])
 				);
