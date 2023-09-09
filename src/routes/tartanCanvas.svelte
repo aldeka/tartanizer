@@ -20,7 +20,7 @@
 			const topThreads: Thread[] = [];
 			const bottomThreads: Thread[] = [];
 			const multiplier = size / threadList.length;
-			const lineWidth = size / threadList.length - 1;
+			const lineWidth = (size / threadList.length) * .8;
 			ctx.fillStyle = 'black';
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
