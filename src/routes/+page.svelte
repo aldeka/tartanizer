@@ -148,27 +148,59 @@
 		}
 	}
 
-	function makeThreadList(colorsText: string, activePalette: { [key: string]: number }): string[] {
+	type PivotFormat = "none" | "half" | "full";
+	function makeThreadList(
+		colorsText: string, activePalette: { [key: string]: number },
+		repetitions: number, pivotFormat: PivotFormat): string[] {
 		const segments = colorsText.trim().split(' ');
-		let retval: string[] = [];
+		let validStripes: Stripe[] = [];
+		let sett: string[] = [];
 		for (const segment of segments) {
 			const stripe = parseStripe(segment);
 			if (stripe !== undefined) {
-				const { colorCode, threadCount } = stripe;
-				retval = retval.concat(
-					makeChunk(threadCount, palette[colorCode][activePalette[colorCode]])
-				);
+				validStripes.push(stripe);
 			}
+		}
+
+		let settStripes;
+		if (pivotFormat === "none") {
+			settStripes = validStripes;
+		} else if (pivotFormat === "half") {
+			settStripes = validStripes.concat(validStripes.toReversed());
+		} else if (pivotFormat === "full") {
+			settStripes = validStripes.concat(validStripes.slice(1, -1).toReversed());
+		}
+
+		for (const stripe of settStripes) {
+			const { colorCode, threadCount } = stripe;
+			sett = sett.concat(
+				makeChunk(threadCount, palette[colorCode][activePalette[colorCode]])
+			);
+		}
+
+		let retval: string[] = [];
+		for (let i = 0 ; i < repetitions ; i++) {
+			retval = retval.concat(sett);
 		}
 		return retval;
 	}
 
 	// Demo is the standard Black Watch pattern
 	let colorString = 'B24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B4';
-	$: threadList = makeThreadList(colorString, activePaletteIndices);
+	let repetitions = 1;
+	let pivotFormat: PivotFormat = "half";
+	$: threadList = makeThreadList(colorString, activePaletteIndices, repetitions, pivotFormat);
 
 	function setPaletteColor(colorCode: string, index: number) {
 		activePaletteIndices[colorCode] = index;
+	}
+
+	function setPivot(format: PivotFormat) {
+		pivotFormat = format;
+	}
+
+	function setRepeat(reps: number) {
+		repetitions = reps;
 	}
 
 	function randomizePattern() {
@@ -233,6 +265,26 @@
 		on:click={randomizePattern}>i'm feeling lucky</button
 	>
 </section>
+<div id="pivot-and-repetition">
+	<button
+		title="pattern is half pivot"
+		on:click={() => { setPivot("half"); }}>B/8</button>
+	<button
+		title="pattern is full pivot"
+		on:click={() => { setPivot("full"); }}>/B8</button>
+	<button
+		title="repeat exact pattern"
+		on:click={() => { setPivot("none"); }}>...</button>
+	<button
+		title="display one sett"
+		on:click={() => { setRepeat(1); }}>1x</button>
+	<button
+		title="display two setts"
+		on:click={() => { setRepeat(2); }}>2x</button>
+	<button
+		title="display three setts"
+		on:click={() => { setRepeat(3); }}>3x</button>
+</div>
 
 <div id="canvas-and-palette">
 	<div>
