@@ -115,11 +115,30 @@
 		activePaletteIndices[color] = 0;
 	}
 
-	const colorRe = new RegExp(`(${validColorCodes.join('|')})(\\d+)`);
-	function makeColor(c: string): [string, number] | undefined {
+	type Stripe = {
+		colorCode: string, // Color of this block of threads
+		threadCount: number, // Number of threads of this color in this block
+		isHalfPivot: boolean,
+		isFullStartPivot: boolean,
+		isFullEndPivot: boolean,
+	}
+
+	const colorRe = new RegExp(`^(/?)(${validColorCodes.join('|')})(/?)(\\d+)(/?)$`);
+	function parseStripe(c: string): Stripe | undefined {
 		const m = c.match(colorRe);
 		if (m) {
-			return [m[1], parseInt(m[2], 10)];
+			const isFullStartPivot = m[1] !== "";
+			const colorCode = m[2];
+			const isHalfPivot = m[3] !== "";
+			const threadCount = parseInt(m[4], 10);
+			const isFullEndPivot = m[5] !== "";
+			return {
+				colorCode,
+				threadCount,
+				isHalfPivot,
+				isFullStartPivot,
+				isFullEndPivot,
+			};
 		}
 	}
 
@@ -127,9 +146,12 @@
 		const segments = colorsText.trim().split(' ');
 		let retval: string[] = [];
 		for (const segment of segments) {
-			const color = makeColor(segment);
-			if (color !== undefined) {
-				const [colorCode, threadCount] = color;
+			const stripe = parseStripe(segment);
+			if (stripe !== undefined) {
+				const {
+					colorCode,
+					threadCount,
+				} = stripe;
 				retval = retval.concat(
 					makeChunk(threadCount, palette[colorCode][activePalette[colorCode]])
 				);
