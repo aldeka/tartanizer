@@ -187,7 +187,7 @@
 	}
 
 	// Demo is the standard Black Watch pattern
-	let colorString = 'B24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B4';
+	let colorString = 'B/24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B/4';
 	let repetitions = 1;
 	let pivotFormat: PivotFormat = 'half';
 	$: threadList = makeThreadList(colorString, activePaletteIndices, repetitions, pivotFormat);
@@ -272,6 +272,17 @@
 	<div id="pivot-and-repetition" class="help">
 		<div id="pivot-options" class="display-options">
 			pivot:
+			<label for="none"
+				><input
+					id="none"
+					type="radio"
+					checked={pivotFormat === 'none'}
+					on:change={() => {
+						setPivot('none');
+					}}
+				/>
+				asymmetric</label
+			>
 			<label for="half"
 				><input
 					id="half"
@@ -292,17 +303,6 @@
 					}}
 				/>
 				full-pivot</label
-			>
-			<label for="none"
-				><input
-					id="none"
-					type="radio"
-					checked={pivotFormat === 'none'}
-					on:change={() => {
-						setPivot('none');
-					}}
-				/>
-				asymmetric</label
 			>
 		</div>
 
