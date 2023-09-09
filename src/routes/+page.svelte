@@ -3,7 +3,9 @@
 	let innerHeight = window.innerHeight;
 
 	import ColorSelector from './colorSelector.svelte';
+	import PivotRepetitionSelector from './pivotRepetitionSelector.svelte';
 	import TartanCanvas from './tartanCanvas.svelte';
+	import type { Stripe, PivotFormat } from './types';
 
 	let defaultCanvasSize = 640;
 	$: size = innerWidth < defaultCanvasSize ? innerWidth : defaultCanvasSize;
@@ -121,14 +123,6 @@
 		activePaletteIndices[color] = 0;
 	}
 
-	type Stripe = {
-		colorCode: string; // Color of this block of threads
-		threadCount: number; // Number of threads of this color in this block
-		isHalfPivot: boolean;
-		isFullStartPivot: boolean;
-		isFullEndPivot: boolean;
-	};
-
 	const colorRe = new RegExp(`^(/?)(${validColorCodes.join('|')})(/?)(\\d+)(/?)$`);
 	function parseStripe(c: string): Stripe | undefined {
 		const m = c.match(colorRe);
@@ -148,7 +142,6 @@
 		}
 	}
 
-	type PivotFormat = 'none' | 'half' | 'full';
 	function makeThreadList(
 		colorsText: string,
 		activePalette: { [key: string]: number },
@@ -269,80 +262,7 @@
 			on:click={randomizePattern}>i'm feeling lucky</button
 		>
 	</div>
-	<div id="pivot-and-repetition" class="help">
-		<div id="pivot-options" class="display-options">
-			pivot:
-			<label for="none"
-				><input
-					id="none"
-					type="radio"
-					checked={pivotFormat === 'none'}
-					on:change={() => {
-						setPivot('none');
-					}}
-				/>
-				asymmetric</label
-			>
-			<label for="half"
-				><input
-					id="half"
-					type="radio"
-					checked={pivotFormat === 'half'}
-					on:change={() => {
-						setPivot('half');
-					}}
-				/>half-pivot</label
-			>
-			<label for="full"
-				><input
-					id="full"
-					type="radio"
-					checked={pivotFormat === 'full'}
-					on:change={() => {
-						setPivot('full');
-					}}
-				/>
-				full-pivot</label
-			>
-		</div>
-
-		<div id="repetitions" class="display-options">
-			repetitions:
-			<label for="one"
-				><input
-					id="one"
-					type="radio"
-					checked={repetitions === 1}
-					on:change={() => {
-						setRepeat(1);
-					}}
-				/>
-				1x</label
-			>
-			<label for="two"
-				><input
-					id="two"
-					type="radio"
-					checked={repetitions === 2}
-					on:change={() => {
-						setRepeat(2);
-					}}
-				/>
-				2x</label
-			>
-			<label for="three"
-				><input
-					id="three"
-					type="radio"
-					checked={repetitions === 3}
-					on:change={() => {
-						setRepeat(3);
-					}}
-				/>
-				3x</label
-			>
-		</div>
-	</div>
+	<PivotRepetitionSelector {pivotFormat} {repetitions} {setRepeat} {setPivot} />
 </section>
 
 <div id="canvas-and-palette">
@@ -438,18 +358,6 @@
 			padding: 0 0.5em;
 			border-color: #111119;
 			border-radius: 0.25em;
-		}
-	}
-
-	#pivot-and-repetition {
-		margin-top: 0.25rem;
-		display: flex;
-		align-items: flex-start;
-
-		& .display-options {
-			display: flex;
-			align-items: flex-start;
-			margin-right: 1rem;
 		}
 	}
 
