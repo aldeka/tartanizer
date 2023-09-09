@@ -116,28 +116,28 @@
 	}
 
 	type Stripe = {
-		colorCode: string, // Color of this block of threads
-		threadCount: number, // Number of threads of this color in this block
-		isHalfPivot: boolean,
-		isFullStartPivot: boolean,
-		isFullEndPivot: boolean,
-	}
+		colorCode: string; // Color of this block of threads
+		threadCount: number; // Number of threads of this color in this block
+		isHalfPivot: boolean;
+		isFullStartPivot: boolean;
+		isFullEndPivot: boolean;
+	};
 
 	const colorRe = new RegExp(`^(/?)(${validColorCodes.join('|')})(/?)(\\d+)(/?)$`);
 	function parseStripe(c: string): Stripe | undefined {
 		const m = c.match(colorRe);
 		if (m) {
-			const isFullStartPivot = m[1] !== "";
+			const isFullStartPivot = m[1] !== '';
 			const colorCode = m[2];
-			const isHalfPivot = m[3] !== "";
+			const isHalfPivot = m[3] !== '';
 			const threadCount = parseInt(m[4], 10);
-			const isFullEndPivot = m[5] !== "";
+			const isFullEndPivot = m[5] !== '';
 			return {
 				colorCode,
 				threadCount,
 				isHalfPivot,
 				isFullStartPivot,
-				isFullEndPivot,
+				isFullEndPivot
 			};
 		}
 	}
@@ -148,10 +148,7 @@
 		for (const segment of segments) {
 			const stripe = parseStripe(segment);
 			if (stripe !== undefined) {
-				const {
-					colorCode,
-					threadCount,
-				} = stripe;
+				const { colorCode, threadCount } = stripe;
 				retval = retval.concat(
 					makeChunk(threadCount, palette[colorCode][activePalette[colorCode]])
 				);
@@ -400,8 +397,8 @@
 
 	section#palette {
 		flex: 1;
-		margin: 1rem 1rem 0 2rem;
-		min-width: 240px;
+		margin: 1rem 1.5rem 0 2rem;
+		min-width: 220px;
 		height: 616px;
 		overflow-y: auto;
 
