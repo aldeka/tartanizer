@@ -52,7 +52,6 @@
 		color: #667;
 
 		&.used {
-			background-color: white;
 			color: #000;
 
 			& .color-label {

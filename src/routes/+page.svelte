@@ -177,6 +177,11 @@
 
 		colorString = pattern;
 	}
+
+	$: usedColorCodes = validColorCodes.filter(
+		(code) => threadList.indexOf(palette[code][activePaletteIndices[code]]) !== -1
+	);
+	$: unusedColorCodes = validColorCodes.filter((code) => !usedColorCodes.includes(code));
 </script>
 
 <svelte:head>
@@ -216,16 +221,33 @@
 		</div>
 		<section id="palette">
 			<h3>Palette</h3>
-			{#each Object.keys(palette) as colorCode}
-				<ColorSelector
-					used={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1}
-					code={colorCode}
-					label={paletteLabels[colorCode]}
-					options={palette[colorCode]}
-					activeIndex={activePaletteIndices[colorCode]}
-					{setPaletteColor}
-				/>
-			{/each}
+			{#if usedColorCodes.length > 0}
+				<div class="used-colors">
+					{#each usedColorCodes as colorCode}
+						<ColorSelector
+							used={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1}
+							code={colorCode}
+							label={paletteLabels[colorCode]}
+							options={palette[colorCode]}
+							activeIndex={activePaletteIndices[colorCode]}
+							{setPaletteColor}
+						/>
+					{/each}
+					<hr />
+				</div>
+			{/if}
+			<div class="unused-colors">
+				{#each unusedColorCodes as colorCode}
+					<ColorSelector
+						used={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1}
+						code={colorCode}
+						label={paletteLabels[colorCode]}
+						options={palette[colorCode]}
+						activeIndex={activePaletteIndices[colorCode]}
+						{setPaletteColor}
+					/>
+				{/each}
+			</div>
 		</section>
 	</div>
 </div>
@@ -368,6 +390,10 @@
 		& h3 {
 			margin: 0 0 0.25rem 1rem;
 			font-weight: 400;
+		}
+
+		& .used-colors {
+			background: white;
 		}
 	}
 </style>
