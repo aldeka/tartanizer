@@ -1,6 +1,12 @@
 <script lang="ts">
+	let innerWidth = window.innerWidth;
+	let innerHeight = window.innerHeight;
+
 	import ColorSelector from './colorSelector.svelte';
 	import TartanCanvas from './tartanCanvas.svelte';
+
+	let defaultCanvasSize = 640;
+	$: size = innerWidth < defaultCanvasSize ? innerWidth : defaultCanvasSize;
 
 	const paletteLabels: { [key: string]: string } = {
 		LR: 'light red',
@@ -203,60 +209,45 @@
 	$: unusedColorCodes = validColorCodes.filter((code) => !usedColorCodes.includes(code));
 </script>
 
+<svelte:window bind:innerWidth bind:innerHeight />
+
 <svelte:head>
 	<title>Tartanizer</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<div id="wrapper">
-	<h1>tartan simulator</h1>
+<h1>tartan simulator</h1>
 
-	<section id="pattern-spec">
-		<div class="pattern-input">
-			<label for="pattern"
-				>pattern <a
-					href="https://www.tartanregister.gov.uk/threadcount"
-					target="_blank"
-					class="help">(color code, then thread count)</a
-				></label
-			>
-			<input id="pattern" name="pattern" type="text" bind:value={colorString} />
-		</div>
-		<button
-			class="stripey-button"
-			title="generate a random tartan pattern"
-			on:click={randomizePattern}>i'm feeling lucky</button
+<section id="pattern-spec">
+	<div class="pattern-input">
+		<label for="pattern"
+			>pattern <a href="https://www.tartanregister.gov.uk/threadcount" target="_blank" class="help"
+				>(color code, then thread count)</a
+			></label
 		>
-	</section>
+		<input id="pattern" name="pattern" type="text" bind:value={colorString} />
+	</div>
+	<button
+		class="stripey-button"
+		title="generate a random tartan pattern"
+		on:click={randomizePattern}>i'm feeling lucky</button
+	>
+</section>
 
-	<div id="canvas-and-palette">
-		<div>
-			<TartanCanvas {threadList} />
-			<footer>
-				<a href="https://github.com/aldeka/tartanizer" target="_blank">made with {'<3'}</a> by
-				<a href="https://github.com/aldeka" target="_blank">aldeka</a>
-				and <a href="https://github.com/zarvox" target="_blank">zarvox</a>
-			</footer>
-		</div>
-		<section id="palette">
-			<h3>Palette</h3>
-			{#if usedColorCodes.length > 0}
-				<div class="used-colors">
-					{#each usedColorCodes as colorCode}
-						<ColorSelector
-							used={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1}
-							code={colorCode}
-							label={paletteLabels[colorCode]}
-							options={palette[colorCode]}
-							activeIndex={activePaletteIndices[colorCode]}
-							{setPaletteColor}
-						/>
-					{/each}
-					<hr />
-				</div>
-			{/if}
-			<div class="unused-colors">
-				{#each unusedColorCodes as colorCode}
+<div id="canvas-and-palette">
+	<div>
+		<TartanCanvas {threadList} width={size} height={size} />
+		<footer>
+			<a href="https://github.com/aldeka/tartanizer" target="_blank">made with {'<3'}</a> by
+			<a href="https://github.com/aldeka" target="_blank">aldeka</a>
+			and <a href="https://github.com/zarvox" target="_blank">zarvox</a>
+		</footer>
+	</div>
+	<section id="palette">
+		<h3>Palette</h3>
+		{#if usedColorCodes.length > 0}
+			<div class="used-colors">
+				{#each usedColorCodes as colorCode}
 					<ColorSelector
 						used={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1}
 						code={colorCode}
@@ -266,20 +257,25 @@
 						{setPaletteColor}
 					/>
 				{/each}
+				<hr />
 			</div>
-		</section>
-	</div>
+		{/if}
+		<div class="unused-colors">
+			{#each unusedColorCodes as colorCode}
+				<ColorSelector
+					used={threadList.indexOf(palette[colorCode][activePaletteIndices[colorCode]]) !== -1}
+					code={colorCode}
+					label={paletteLabels[colorCode]}
+					options={palette[colorCode]}
+					activeIndex={activePaletteIndices[colorCode]}
+					{setPaletteColor}
+				/>
+			{/each}
+		</div>
+	</section>
 </div>
 
 <style>
-	#wrapper {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: stretch;
-		font-size: 16px;
-	}
-
 	.help {
 		font-size: 12px;
 	}
@@ -292,6 +288,7 @@
 	}
 
 	section#pattern-spec {
+		flex: 0;
 		display: flex;
 		align-items: flex-end;
 		justify-content: space-between;
@@ -308,8 +305,7 @@
 
 	.pattern-input {
 		text-align: left;
-		flex: 0;
-		min-width: 648px;
+		flex: 1;
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
@@ -325,7 +321,7 @@
 	.stripey-button {
 		cursor: pointer;
 		display: block;
-		flex: 1;
+		flex: 0;
 		min-width: 240px;
 		margin-left: 2rem;
 		border-radius: 0.25em;
@@ -380,6 +376,7 @@
 	}
 
 	#canvas-and-palette {
+		flex: 1;
 		width: 100%;
 		display: flex;
 		flex-direction: row;
@@ -413,6 +410,22 @@
 
 		& .used-colors {
 			background: white;
+		}
+	}
+
+	@media (max-width: 1023px) {
+		#canvas-and-palette {
+			flex: 1;
+			flex-direction: column;
+			align-items: center;
+			max-height: none;
+		}
+
+		section#palette {
+			margin-right: 0;
+			margin-left: 0;
+			margin-bottom: 2rem;
+			max-width: 100%;
 		}
 	}
 </style>

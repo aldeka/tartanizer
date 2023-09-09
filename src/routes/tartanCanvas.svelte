@@ -1,7 +1,10 @@
 <script lang="ts">
 	export let threadList: string[] = [];
-	export let size: number = 640;
+	export let width: number = 640;
+	export let height: number = 640;
 	import { afterUpdate, onMount } from 'svelte';
+
+	$: smallerDimension = width < height ? width : height;
 
 	let canvas: HTMLCanvasElement;
 
@@ -19,8 +22,9 @@
 		if (ctx) {
 			const topThreads: Thread[] = [];
 			const bottomThreads: Thread[] = [];
-			const multiplier = size / threadList.length;
-			const lineWidth = (size / threadList.length) * .8;
+			const multiplier = smallerDimension / threadList.length;
+			const lineWidth = (smallerDimension / threadList.length) * 0.8;
+
 			ctx.fillStyle = 'black';
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -88,9 +92,11 @@
 	afterUpdate(() => {
 		repaint();
 	});
+
+	console.log('size', width, height);
 </script>
 
-<canvas bind:this={canvas} height={size} width={size} />
+<canvas bind:this={canvas} {width} {height} />
 
 <style>
 	canvas {
