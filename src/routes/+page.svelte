@@ -2,10 +2,14 @@
 	let innerWidth = 1280;
 	let innerHeight = 1024;
 
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+
 	import ColorSelector from './colorSelector.svelte';
 	import PivotRepetitionSelector from './pivotRepetitionSelector.svelte';
 	import TartanCanvas from './tartanCanvas.svelte';
 	import type { Stripe, PivotFormat } from './types';
+	import LinkCopyButton from './linkCopyButton.svelte';
 
 	let defaultCanvasSize = 640;
 	$: size = innerWidth < defaultCanvasSize ? innerWidth : defaultCanvasSize;
@@ -182,7 +186,7 @@
 	}
 
 	// Demo is the standard Black Watch pattern
-	let colorString = 'B/24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B/4';
+	let colorString = parseUrlParams() || 'B/24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B/4';
 	let repetitions = 1;
 	let pivotFormat: PivotFormat = 'half';
 	$: threadList = makeThreadList(colorString, activePaletteIndices, repetitions, pivotFormat);
@@ -219,6 +223,10 @@
 					// rather than a bunch of same-width stripes
 					newNumber = Math.round(newNumber / 2);
 				}
+				if (newNumber > 5) {
+					// large tartan numbers are typically even, soooo
+					newNumber += newNumber % 2;
+				}
 				if (patternSize + newNumber > maxPatternSize) {
 					newNumber = maxPatternSize - patternSize;
 				}
@@ -235,6 +243,34 @@
 		(code) => threadList.indexOf(palette[code][activePaletteIndices[code]]) !== -1
 	);
 	$: unusedColorCodes = validColorCodes.filter((code) => !usedColorCodes.includes(code));
+
+	function parseUrlParams() {
+		const tc = $page.url.searchParams.get('TC');
+
+		if (tc) {
+			// get palette
+			validColorCodes.forEach((code) => {
+				const hexColor = $page.url.searchParams.get(code);
+				if (hexColor) {
+					// look for specified hex, set index accordingly
+					const index = palette[code].indexOf(hexColor);
+					activePaletteIndices[code] = index !== -1 ? index : 1;
+				}
+			});
+		}
+		return tc;
+	}
+
+	function getSharableUrl(s: string, used: string[], indices: { [key: string]: number }) {
+		const origin = $page.url.origin;
+		let paletteParams = '';
+		used.forEach((code) => {
+			paletteParams += `&${code}=${palette[code][indices[code]]}`;
+		});
+		return encodeURI(`${origin}/?TC=${s}${paletteParams}`);
+	}
+
+	$: sharableUrl = getSharableUrl(colorString, usedColorCodes, activePaletteIndices);
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight />
@@ -256,7 +292,10 @@
 					class="help">(color code, then thread count)</a
 				></label
 			>
-			<input id="pattern" name="pattern" type="text" bind:value={colorString} />
+			<div class="input-and-copy">
+				<input id="pattern" name="pattern" type="text" bind:value={colorString} />
+				<LinkCopyButton url={sharableUrl} />
+			</div>
 		</div>
 		<button
 			class="stripey-button"
@@ -346,7 +385,6 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		align-items: stretch;
 		margin: 0;
 
 		& label {
@@ -354,12 +392,23 @@
 			margin: 0;
 			font-size: 18px;
 			margin-bottom: 0.25rem;
+			width: max-content;
 		}
 
 		& input {
 			padding: 0 0.5em;
 			border-color: #111119;
 			border-radius: 0.25em;
+		}
+	}
+
+	.input-and-copy {
+		flex: 1;
+		position: relative;
+
+		& input {
+			width: 100%;
+			padding-right: 3rem;
 		}
 	}
 
