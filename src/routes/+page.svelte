@@ -200,7 +200,7 @@
 			}
 		}
 
-		colorString = pattern;
+		colorString = pattern.trim();
 	}
 
 	$: usedColorCodes = validColorCodes.filter(
