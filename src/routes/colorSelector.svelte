@@ -81,7 +81,7 @@
 			justify-content: center;
 			height: 2rem;
 			width: 2.5rem;
-			border: 1pt solid black;
+			border: 1px solid black;
 
 			&.active {
 				box-shadow: 0px 0px 0px 3px orange;

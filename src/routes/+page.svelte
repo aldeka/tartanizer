@@ -3,7 +3,9 @@
 	let innerHeight = window.innerHeight;
 
 	import ColorSelector from './colorSelector.svelte';
+	import PivotRepetitionSelector from './pivotRepetitionSelector.svelte';
 	import TartanCanvas from './tartanCanvas.svelte';
+	import type { Stripe, PivotFormat } from './types';
 
 	let defaultCanvasSize = 640;
 	$: size = innerWidth < defaultCanvasSize ? innerWidth : defaultCanvasSize;
@@ -121,14 +123,6 @@
 		activePaletteIndices[color] = 0;
 	}
 
-	type Stripe = {
-		colorCode: string; // Color of this block of threads
-		threadCount: number; // Number of threads of this color in this block
-		isHalfPivot: boolean;
-		isFullStartPivot: boolean;
-		isFullEndPivot: boolean;
-	};
-
 	const colorRe = new RegExp(`^(/?)(${validColorCodes.join('|')})(/?)(\\d+)(/?)$`);
 	function parseStripe(c: string): Stripe | undefined {
 		const m = c.match(colorRe);
@@ -148,27 +142,59 @@
 		}
 	}
 
-	function makeThreadList(colorsText: string, activePalette: { [key: string]: number }): string[] {
+	function makeThreadList(
+		colorsText: string,
+		activePalette: { [key: string]: number },
+		repetitions: number,
+		pivotFormat: PivotFormat
+	): string[] {
 		const segments = colorsText.trim().split(' ');
-		let retval: string[] = [];
+		let validStripes: Stripe[] = [];
+		let sett: string[] = [];
 		for (const segment of segments) {
 			const stripe = parseStripe(segment);
 			if (stripe !== undefined) {
-				const { colorCode, threadCount } = stripe;
-				retval = retval.concat(
-					makeChunk(threadCount, palette[colorCode][activePalette[colorCode]])
-				);
+				validStripes.push(stripe);
 			}
+		}
+
+		let settStripes: Stripe[] = [];
+		if (pivotFormat === 'none') {
+			settStripes = validStripes;
+		} else if (pivotFormat === 'half') {
+			settStripes = validStripes.concat(validStripes.reverse());
+		} else if (pivotFormat === 'full') {
+			settStripes = validStripes.concat(validStripes.slice(1, -1).reverse());
+		}
+
+		for (const stripe of settStripes) {
+			const { colorCode, threadCount } = stripe;
+			sett = sett.concat(makeChunk(threadCount, palette[colorCode][activePalette[colorCode]]));
+		}
+
+		let retval: string[] = [];
+		for (let i = 0; i < repetitions; i++) {
+			retval = retval.concat(sett);
 		}
 		return retval;
 	}
 
 	// Demo is the standard Black Watch pattern
-	let colorString = 'B24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B4';
-	$: threadList = makeThreadList(colorString, activePaletteIndices);
+	let colorString = 'B/24 K4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K4 B/4';
+	let repetitions = 1;
+	let pivotFormat: PivotFormat = 'half';
+	$: threadList = makeThreadList(colorString, activePaletteIndices, repetitions, pivotFormat);
 
 	function setPaletteColor(colorCode: string, index: number) {
 		activePaletteIndices[colorCode] = index;
+	}
+
+	function setPivot(format: PivotFormat) {
+		pivotFormat = format;
+	}
+
+	function setRepeat(reps: number) {
+		repetitions = reps;
 	}
 
 	function randomizePattern() {
@@ -219,19 +245,24 @@
 <h1>tartan simulator</h1>
 
 <section id="pattern-spec">
-	<div class="pattern-input">
-		<label for="pattern"
-			>pattern <a href="https://www.tartanregister.gov.uk/threadcount" target="_blank" class="help"
-				>(color code, then thread count)</a
-			></label
+	<div class="input-and-button">
+		<div class="pattern-input">
+			<label for="pattern"
+				>pattern <a
+					href="https://www.tartanregister.gov.uk/threadcount"
+					target="_blank"
+					class="help">(color code, then thread count)</a
+				></label
+			>
+			<input id="pattern" name="pattern" type="text" bind:value={colorString} />
+		</div>
+		<button
+			class="stripey-button"
+			title="generate a random tartan pattern"
+			on:click={randomizePattern}>i'm feeling lucky</button
 		>
-		<input id="pattern" name="pattern" type="text" bind:value={colorString} />
 	</div>
-	<button
-		class="stripey-button"
-		title="generate a random tartan pattern"
-		on:click={randomizePattern}>i'm feeling lucky</button
-	>
+	<PivotRepetitionSelector {pivotFormat} {repetitions} {setRepeat} {setPivot} />
 </section>
 
 <div id="canvas-and-palette">
@@ -290,16 +321,21 @@
 	section#pattern-spec {
 		flex: 0;
 		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
+		flex-direction: column;
 		margin-bottom: 2rem;
-		font-size: 18px;
 
-		& input,
-		& button {
-			max-height: 3em;
-			min-height: 3em;
-			font-size: 24px;
+		& .input-and-button {
+			display: flex;
+			align-items: flex-end;
+			justify-content: space-between;
+			font-size: 18px;
+
+			& input,
+			& .stripey-button {
+				max-height: 3em;
+				min-height: 3em;
+				font-size: 24px;
+			}
 		}
 	}
 
@@ -310,6 +346,13 @@
 		flex-direction: column;
 		align-items: stretch;
 		margin: 0;
+
+		& label {
+			font-weight: 400;
+			margin: 0;
+			font-size: 18px;
+			margin-bottom: 0.25rem;
+		}
 
 		& input {
 			padding: 0 0.5em;
@@ -383,13 +426,6 @@
 		align-items: stretch;
 		justify-content: space-between;
 		max-height: 640px;
-	}
-
-	label {
-		font-weight: 400;
-		margin: 0;
-		margin-bottom: 0.25em;
-		font-size: 18px;
 	}
 
 	section#palette {
