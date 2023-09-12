@@ -162,9 +162,9 @@
 		if (pivotFormat === 'none') {
 			settStripes = validStripes;
 		} else if (pivotFormat === 'half') {
-			settStripes = validStripes.concat(validStripes.reverse());
+			settStripes = validStripes.concat(validStripes.toReversed());
 		} else if (pivotFormat === 'full') {
-			settStripes = validStripes.concat(validStripes.slice(1, -1).reverse());
+			settStripes = validStripes.concat(validStripes.slice(1, -1).toReversed());
 		}
 
 		for (const stripe of settStripes) {
