@@ -1,6 +1,6 @@
 <script lang="ts">
-	let innerWidth = window.innerWidth;
-	let innerHeight = window.innerHeight;
+	let innerWidth = 1280;
+	let innerHeight = 1024;
 
 	import ColorSelector from './colorSelector.svelte';
 	import PivotRepetitionSelector from './pivotRepetitionSelector.svelte';
