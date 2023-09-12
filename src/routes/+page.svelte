@@ -158,13 +158,15 @@
 			}
 		}
 
+		// because Typescript hates toReversed for some reason
+		let stripesCopy = [...validStripes];
 		let settStripes: Stripe[] = [];
 		if (pivotFormat === 'none') {
 			settStripes = validStripes;
 		} else if (pivotFormat === 'half') {
-			settStripes = validStripes.concat(validStripes.toReversed());
+			settStripes = validStripes.concat(stripesCopy.reverse());
 		} else if (pivotFormat === 'full') {
-			settStripes = validStripes.concat(validStripes.slice(1, -1).toReversed());
+			settStripes = validStripes.concat([...stripesCopy.slice(1, -1)].reverse());
 		}
 
 		for (const stripe of settStripes) {
